@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!--
+  UNOFFICIAL PREVIEW. Not a University of San Francisco website.
+  A replica of https://www.usfca.edu/koret/facilities/indoor-swimming with the linked
+  Google Sheet lane schedule replaced by a live Pool Relay calendar.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Indoor Swimming Pool &mdash; Koret (Pool Relay preview)</title>
+<meta name="description" content="Unofficial preview of the USF Koret indoor pool page with a live Pool Relay lane calendar in place of the linked spreadsheet.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:  #00543c;   /* USF green */
+    --green-2:#00755a;
+    --gold:   #fdbb30;   /* USF gold */
+    --ink:    #333333;
+    --muted:  #5c6660;
+    --rule:   #dfe3e1;
+    --wash:   #f4f6f5;
+    --font:      "Source Sans 3", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-disp: "Oswald", "Source Sans 3", Arial, sans-serif;
+    --font-body: "Source Serif 4", Georgia, serif;
+  }
+  *,*::before,*::after{ box-sizing:border-box }
+  html{ -webkit-text-size-adjust:100% }
+  body{ margin:0; background:#fff; color:var(--ink); font-family:var(--font); font-size:17px; line-height:1.65 }
+  img{ max-width:100%; display:block }
+  a{ color:var(--green-2) }
+
+  .preview-note{
+    background:#2b2b2b;color:#fff;font-size:14px;line-height:1.5;
+    padding:9px 18px;text-align:center;
+  }
+  .preview-note b{ color:var(--gold); font-weight:700 }
+  .preview-note a{ color:#fff }
+
+  /* ── Header ─────────────────────────────────────────────────────────────── */
+  header.site{
+    background:#000; padding:16px 30px; display:flex; align-items:center; gap:20px;
+  }
+  .wordmark{ display:flex; align-items:center; gap:14px; text-decoration:none }
+  .wordmark .crest{
+    width:44px; height:44px; flex:none; border:3px solid var(--gold);
+    transform:rotate(45deg); position:relative;
+  }
+  .wordmark .crest::after{
+    content:""; position:absolute; inset:7px; border:3px solid var(--gold);
+  }
+  .wordmark span{
+    color:#fff; font-family:var(--font-disp); font-weight:400; font-size:15px;
+    letter-spacing:.16em; text-transform:uppercase; line-height:1.25;
+  }
+
+  /* ── Hero ───────────────────────────────────────────────────────────────── */
+  .hero{ position:relative; background:#08301f }
+  .hero img{ width:100%; height:clamp(200px,32vw,470px); object-fit:cover; opacity:.92 }
+  .hero .cap{
+    position:absolute; left:0; right:0; bottom:0; padding:24px 30px 26px;
+    background:linear-gradient(transparent, rgba(0,0,0,.62) 45%);
+  }
+  .hero .eyebrow{
+    color:#fff; font-family:var(--font-disp); font-size:13px; font-weight:500;
+    letter-spacing:.14em; text-transform:uppercase; margin:0 0 6px;
+  }
+  .hero h1{
+    margin:0; color:#fff; font-family:var(--font-disp); font-weight:500;
+    font-size:clamp(30px,5.5vw,54px); line-height:1.06;
+  }
+
+  .crumbs{
+    border-bottom:1px solid var(--rule); padding:14px 30px;
+    font-family:var(--font-disp); font-size:12px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--muted);
+  }
+  .crumbs a{ color:var(--muted); text-decoration:none }
+  .crumbs span{ color:var(--green) }
+
+  /* ── Layout ─────────────────────────────────────────────────────────────── */
+  .layout{
+    max-width:1180px; margin:0 auto; padding:34px 30px 10px;
+    display:grid; grid-template-columns:280px 1fr; gap:44px; align-items:start;
+  }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; gap:24px } }
+  .onthispage{
+    border:1px solid var(--rule); border-radius:3px; padding:20px 22px; background:#fff;
+  }
+  .onthispage h2{
+    margin:0 0 12px; font-family:var(--font-disp); font-size:12px; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink);
+  }
+  .onthispage ul{ list-style:none; margin:0; padding:0 }
+  .onthispage li{ padding:7px 0 7px 12px; border-left:3px solid transparent }
+  .onthispage li.here{ border-left-color:var(--gold) }
+  .onthispage a{ color:var(--green); text-decoration:none; font-weight:600 }
+
+  .content h2{
+    margin:0 0 12px; color:var(--green); font-family:var(--font-disp);
+    font-weight:500; font-size:clamp(26px,3.4vw,36px);
+  }
+  .content h3{ margin:26px 0 6px; color:var(--green); font-family:var(--font-disp); font-weight:500; font-size:22px }
+  .content p{ font-family:var(--font-body); margin:0 0 14px }
+  .content .facts{ font-family:var(--font-body); margin:0 0 18px; color:var(--muted) }
+
+  /* ── The calendar ───────────────────────────────────────────────────────── */
+  /* The calendar breaks OUT of the text column. Seventeen lane columns will not fit a
+     600px measure, and a lane schedule squeezed until it scrolls sideways is the problem
+     this page exists to solve, not a demonstration of solving it. */
+  .cal-band{ background:var(--wash); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+             margin:30px 0 0; padding:28px 30px 32px }
+  .cal-inner{ max-width:1360px; margin:0 auto }
+  @media (max-width:760px){ .cal-band{ padding:20px 16px 24px } }
+  .cal-head{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px }
+  .cal-head h3{ margin:0 }
+  .cal-head .live{
+    font-family:var(--font-disp); font-size:12px; font-weight:600; letter-spacing:.11em;
+    text-transform:uppercase; color:var(--green); background:var(--gold);
+    padding:4px 11px; border-radius:2px;
+  }
+  .frame{ border:1px solid var(--rule); border-radius:3px; overflow:hidden; background:#fff;
+          box-shadow:0 10px 28px rgba(0,84,60,.10) }
+  .frame iframe{ display:block; width:100%; height:780px; border:0 }
+  @media (max-width:760px){ .frame iframe{ height:620px } }
+  .cal-foot{ font-family:var(--font-body); font-size:15px; color:var(--muted); margin-top:10px }
+
+  .replaces{ background:var(--wash); border-left:4px solid var(--gold); padding:20px 24px; margin:30px 0 0 }
+  .replaces h3{ margin:0 0 10px; color:var(--green); font-family:var(--font-disp); font-weight:500; font-size:20px }
+  .replaces ul{ margin:0; padding-left:20px; font-family:var(--font-body); color:var(--muted) }
+  .replaces li{ margin-bottom:9px }
+  .replaces code{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em }
+
+  /* ── Footer ─────────────────────────────────────────────────────────────── */
+  footer.site{ margin-top:44px; background:var(--green); color:#fff; padding:32px 30px }
+  footer.site .cols{ max-width:1180px; margin:0 auto; display:flex; gap:44px; flex-wrap:wrap; justify-content:space-between }
+  footer.site a{ color:#fff }
+  footer.site .fine{
+    max-width:1180px; margin:24px auto 0; padding-top:15px;
+    border-top:1px solid rgba(255,255,255,.25); font-size:13px; color:#c6ddd3;
+  }
+  @media (max-width:760px){
+    header.site{ padding:12px 16px }
+    .layout{ padding:22px 16px 6px }
+    .crumbs{ padding:12px 16px; font-size:11px }
+    .hero .cap{ padding:16px }
+    body{ font-size:16px }
+  }
+</style>
+</head>
+<body>
+
+<div class="preview-note">
+  <b>Unofficial preview.</b> Not a USF page &mdash; a mock-up of
+  <a href="https://www.usfca.edu/koret/facilities/indoor-swimming">the Koret Indoor Swimming Pool page</a>
+  showing the linked lane spreadsheet replaced by a live calendar.
+</div>
+
+<header class="site">
+  <a class="wordmark" href="https://www.usfca.edu">
+    <span class="crest" aria-hidden="true"></span>
+    <span>University of<br>San Francisco</span>
+  </a>
+</header>
+
+<div class="hero">
+  <img src="https://www.usfca.edu/sites/default/files/styles/16_9_1800x1013/public/2025-03/vt-koret-pool.jpg.jpeg?h=8abcec71&itok=DagIEOkY"
+       alt="The Koret Center indoor pool, looking down the lanes">
+  <div class="cap">
+    <p class="eyebrow">Koret Health &amp; Recreation Center</p>
+    <h1>Indoor Swimming Pool</h1>
+  </div>
+</div>
+
+<p class="crumbs">
+  <a href="https://www.usfca.edu">Home</a> &rsaquo;
+  <a href="https://www.usfca.edu/koret">Koret Health &amp; Recreation Center</a> &rsaquo;
+  <a href="https://www.usfca.edu/koret/aquatics">Aquatics</a> &rsaquo;
+  <span>Indoor Swimming Pool</span>
+</p>
+
+<div class="layout">
+  <aside class="onthispage">
+    <h2>On this page</h2>
+    <ul>
+      <li class="here"><a href="#pool">Pool Information</a></li>
+      <li><a href="#lanes">Lane Schedule</a></li>
+      <li><a href="https://www.usfca.edu/koret/facilities/indoor-swimming">Masters Swimming</a></li>
+      <li><a href="https://www.usfca.edu/koret/facilities/indoor-swimming">Swim Lessons</a></li>
+      <li><a href="https://www.usfca.edu/koret/facilities/indoor-swimming">Youth Swim Team</a></li>
+      <li><a href="https://www.usfca.edu/koret/facilities/indoor-swimming">Lifeguarding</a></li>
+    </ul>
+  </aside>
+
+  <div class="content">
+    <h2 id="pool">Pool Information</h2>
+    <p class="facts">Pool average temperature: 81.5&deg; (Range 80&deg;&ndash;82&deg;, 79&deg; for swim meets)</p>
+
+    <h3>Lap Swim</h3>
+    <p>Lap lanes will be open during all pool hours, although the number of lanes available will
+      vary depending on other programs in progress, (i.e., during all swim lesson programs the
+      shallow lanes will be closed to anyone other than those enrolled in the lessons). The pool
+      will have limited lanes from 4&ndash;6 p.m., Monday&ndash;Friday due to swim team practices
+      and other activities.</p>
+    <p>Circle swimming is mandatory during crowded times.</p>
+
+    <h3>Shallow Lane</h3>
+    <p>There is only ONE shallow lane at the Koret Center pool. This lane is often blocked for
+      swim lessons, trainings, or programs. Please take note if you plan to use this lane.</p>
+
+  </div>
+</div>
+
+<section class="cal-band" id="lanes">
+  <div class="cal-inner">
+
+      <div class="cal-head">
+        <h3>Lane Schedule</h3>
+        <span class="live">Live</span>
+      </div>
+      <div class="frame">
+        <iframe src="https://www.poolrelay.com/embed/guBdc45nE8tdP6ykKCUpoV"
+                title="Koret pool lane schedule"></iframe>
+      </div>
+      <p class="cal-foot">Every lane, hour by hour. Move between days with the arrows, and tap a
+        programme in the filter to see only that. On a phone the same schedule opens as a list.</p>
+  </div>
+</section>
+
+<div class="layout" style="grid-template-columns:1fr">
+  <div class="content">
+    <div class="replaces">
+      <h3>What this replaces</h3>
+      <ul>
+        <li>The page currently says &ldquo;<em>it is recommended to check our Pool Lane Schedule
+          before each visit to avoid lane closures and events</em>&rdquo; &mdash; and that link opens a
+          <strong>Google Sheet</strong>. A swimmer deciding whether to come now has to open a
+          spreadsheet and find today's column.</li>
+        <li>The prose above says lanes are <em>limited from 4&ndash;6 p.m.</em> The calendar shows
+          exactly which lanes, on which day, without anyone having to keep the sentence and the
+          spreadsheet in step.</li>
+        <li><strong>Slow, Medium and Fast move through the day</strong> &mdash; slow in lanes
+          2&ndash;5 in the morning, fast in 12&ndash;15 and the deep end. That is the thing a
+          swimmer actually wants and the hardest thing to write down in prose.</li>
+        <li>The shallow lane, the deep end and the 3:30 cleaning slot are bookings like any other,
+          so they appear without a separate note.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="cols">
+    <div>
+      <strong>Koret Health &amp; Recreation Center</strong><br>
+      University of San Francisco<br>
+      2130 Fulton Street, San Francisco, CA 94117
+    </div>
+    <div>
+      <a href="https://www.usfca.edu/koret">Koret Center</a><br>
+      <a href="https://www.usfca.edu/koret/aquatics">Aquatics</a><br>
+      <a href="https://www.usfca.edu/koret/facilities/indoor-swimming">Indoor Swimming Pool</a>
+    </div>
+  </div>
+  <p class="fine">This page is an unofficial preview built to demonstrate an embedded
+    <a href="https://www.poolrelay.com">Pool Relay</a> calendar. It is not operated by or
+    affiliated with the University of San Francisco. For official hours, schedules and closures
+    see <a href="https://www.usfca.edu/koret">usfca.edu/koret</a>.</p>
+</footer>
+
+</body>
+</html>
